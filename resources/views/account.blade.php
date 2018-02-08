@@ -177,9 +177,9 @@
                                         <table class="table">
                                             <thead>
                                             <tr>
-                                                <th class="col-lg-3">ID</th>
-                                                <th class="col-lg-3">Hashrate (rough, short average)</th>
-                                                <th class="col-lg-3">Hashrate (accurate, long average)</th>
+                                                <th class="col-lg-1">ID</th>
+                                                <th class="col-lg-4">Hashrate (rough, short average)</th>
+                                                <th class="col-lg-4">Hashrate (accurate, long average)</th>
                                                 <th class="col-lg-2">Last Share</th>
                                             </tr>
                                             </thead>
@@ -324,6 +324,7 @@
                                     labelString: 'Workers'
                                 },
                                 ticks: {
+                                    min: 0,
                                     callback: function (v, i) {
                                         return v.toFixed(0);
                                     }
@@ -396,9 +397,20 @@
                                 startPoint++;
                             }
 
+                            var minHash = Math.min(...chartHashrate);
+                            var maxHash = Math.max(...chartHashrate);
+                            var stepHash = maxHash - minHash;
+
+                            var maxWork = Math.max(...chartWorkers);
+
                             chart.data.labels = chartTimestamp;
                             chart.data.datasets[0].data = chartHashrate;
+                            chart.options.scales.yAxes[0].ticks.min = minHash;
+                            chart.options.scales.yAxes[0].ticks.max = maxHash + stepHash;
+                            chart.options.scales.yAxes[0].ticks.stepSize = stepHash;
+
                             chart.data.datasets[1].data = chartWorkers;
+                            chart.options.scales.yAxes[1].ticks.max = maxWork + (maxWork / 2);
                             chart.update();
 
                             // YourWorkers

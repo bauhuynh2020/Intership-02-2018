@@ -164,7 +164,6 @@
                         method: 'get'
                     })
                         .done(function (response) {
-
                             $('#stats-miners-online').text(response.minersTotal);
                             $('#stats-pool-hash-rate').text(hashPower(response.hashrate));
                             $('#stats-last-block-found').text(getMinute(response.stats.lastBlockFound));
@@ -172,7 +171,7 @@
                             $('#stats-blockchain-height').text(response.nodes[0].height);
                             $('#stats-price').html(response.prices.BTC + ' <i class="fa fa-bitcoin"></i>');
 
-                            var rangerPoint = 20;
+                            var rangerPoint = 50;
                             var poolHistory = response.poolHistory;
                             var chartTimestamp = new Array();
                             var chartHashrate = new Array();
@@ -185,8 +184,16 @@
                                 startPoint++;
                             }
 
+                            var minHash = Math.min(...chartHashrate);
+                            var maxHash = Math.max(...chartHashrate);
+                            var stepHash = maxHash - minHash;
+
                             chart.data.labels = chartTimestamp;
                             chart.data.datasets[0].data = chartHashrate;
+
+                            chart.options.scales.yAxes[0].ticks.min = minHash;
+                            chart.options.scales.yAxes[0].ticks.max = maxHash + stepHash;
+                            chart.options.scales.yAxes[0].ticks.stepSize = stepHash;
                             chart.update();
 
                             setTimeout(function () {

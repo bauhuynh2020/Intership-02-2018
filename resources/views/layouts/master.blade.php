@@ -29,6 +29,11 @@
     <script type="text/javascript" src="{{ asset('') }}assets/js/core/app.js"></script>
     <!-- /theme JS files -->
 
+    <style>
+        table th, table td {
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
