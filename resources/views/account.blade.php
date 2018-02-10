@@ -262,6 +262,8 @@
         (function ($) {
             $(function () {
                 var api = 'http://beta-pirl.pool.sexy/api/accounts/' + '{{ $id }}';
+                var api_2 = 'http://beta-pirl.pool.sexy/api/stats';
+                var roundSharesAccount = 0;
 
                 var options = {
                     tooltips: {
@@ -359,26 +361,37 @@
                     options: options
                 });
 
+                var statsRefresh = function () {
+                    $.ajax({
+                        url: api_2,
+                        method: 'get'
+                    })
+                        .done(function (response) {
+                            var roundShare = (roundSharesAccount / response.stats.roundShares) * 100;
+                            $('#account-your-round-share').text(roundShare.toFixed(2) + '%');
+                        })
+                }
+
                 var accountRefresh = function () {
                     $.ajax({
                         url: api,
                         method: 'get'
                     })
                         .done(function (response) {
-
+                            roundSharesAccount = response.roundShares;
                             //Main
                             $('#account-immature-balance').text(balancePrice(response.stats.immature));
                             $('#account-pending-balance').text(balancePrice(response.stats.balance));
                             $('#account-total-paid').text(balancePrice(response.stats.paid));
                             $('#account-last-24h-reward').text(balancePrice(response['24hreward']));
 
-                            $('#account-last-share-submitted').text(getSeconds(response.stats.lastShare));
+                            $('#account-last-share-submitted').text(getTime(response.stats.lastShare));
                             $('#account-workers-online').text(response.workersOnline);
                             $('#account-hashrate-30m').text(hashPower(response.currentHashrate));
                             $('#account-hashrate-3h').text(hashPower(response.hashrate));
                             $('#account-blocks-found').text(response.stats.blocksFound);
                             $('#account-total-payments').text(response.paymentsTotal);
-                            $('#account-your-round-share').text(balancePrice(response.roundShares));
+                            // $('#account-your-round-share').text((100 * response.roundShares).toFixed(2) + ' %');
                             $('#account-daily-estimated-gain').text((response.earnings.USD).toFixed(2) + ' USD');
 
                             // Charts
@@ -397,17 +410,17 @@
                                 startPoint++;
                             }
 
-                            var minHash = Math.min(...chartHashrate);
-                            var maxHash = Math.max(...chartHashrate);
-                            var stepHash = maxHash - minHash;
+                            // var minHash = Math.min(...chartHashrate);
+                            // var maxHash = Math.max(...chartHashrate);
+                            // var stepHash = maxHash - minHash;
 
                             var maxWork = Math.max(...chartWorkers);
 
                             chart.data.labels = chartTimestamp;
                             chart.data.datasets[0].data = chartHashrate;
-                            chart.options.scales.yAxes[0].ticks.min = minHash;
-                            chart.options.scales.yAxes[0].ticks.max = maxHash + stepHash;
-                            chart.options.scales.yAxes[0].ticks.stepSize = stepHash;
+                            // chart.options.scales.yAxes[0].ticks.min = minHash;
+                            // chart.options.scales.yAxes[0].ticks.max = maxHash + stepHash;
+                            // chart.options.scales.yAxes[0].ticks.stepSize = stepHash;
 
                             chart.data.datasets[1].data = chartWorkers;
                             chart.options.scales.yAxes[1].ticks.max = maxWork + (maxWork / 2);
@@ -426,7 +439,7 @@
                                     '<td>' + key + '</td>' +
                                     '<td>' + hashPower(item.hr) + '</td>' +
                                     '<td>' + hashPower(item.hr2) + '</td>' +
-                                    '<td>' + getSeconds(item.lastBeat) + '</td>' +
+                                    '<td>' + getTime(item.lastBeat) + '</td>' +
                                     '</tr>';
                             })
                             $('#account-yourworkers').html(tbodyOfTable);
@@ -468,14 +481,19 @@
                                     '</tr>';
                             })
                             $('#account-payouts').html(tbodyOfTable);
-
-                            setTimeout(function () {
-                                accountRefresh();
-                            }, time);
                         })
                 }
 
                 accountRefresh();
+                setInterval(function () {
+                    accountRefresh();
+                }, time * 10);
+
+                statsRefresh();
+                setInterval(function () {
+                    statsRefresh();
+                    statsRefresh();
+                }, time);
 
                 $(document).on('click', '#account-payouts a', function () {
                     var tx = 'https://explorer.pirl.io/#/tx/';
@@ -486,17 +504,27 @@
             })
         })(jQuery)
 
-        function getSeconds(number) {
-            var dateDiff = new Date(1000 * number);
+        function getTime(d1) {
+            var dateDiff = new Date(1000 * d1);
             var dateCurrent = new Date();
             var timeDiff = Math.abs(dateCurrent.getTime() - dateDiff.getTime());
-            var diffDays = Math.ceil(timeDiff / 1000);
+            // var diffDays = Math.ceil(timeDiff / 1000);
+            //
+            // return (diffDays / 60).toFixed(0) + ' minutes ago';
 
-            if (diffDays > 60) {
-                return '1 m ' + (diffDays - 60) + ' s';
+            var hours = Math.floor(timeDiff / (24 * 60 * 1000));
+            var minutes = Math.floor(timeDiff / (60 * 1000));
+            var seconds = timeDiff % 60;
+
+            var time = '';
+            if (hours > 0) {
+                time += hours + ' h ';
+            }
+            if (minutes > 0) {
+                time += minutes + 'm ';
             }
 
-            return diffDays + ' s';
+            return time + seconds + ' s';
         }
     </script>
 @stop

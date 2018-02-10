@@ -11,24 +11,28 @@
     <div class="panel panel-flat">
         <div class="container-fluid">
             <div class="row">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th class="col-lg-2">Blocks</th>
-                            <th class="col-lg-2">Shares/Diff</th>
-                            <th class="col-lg-2">Uncle Rate</th>
-                            <th class="col-lg-2">Orphan Rate</th>
-                        </tr>
-                        </thead>
-                        <tbody id="block-lucks-tbody">
-                        <tr>
-                            <td colspan="4" class="text-center">
-                                <h3>Loading...</h3>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="col-lg-12">
+                    <h6>Pool always pay(s) full block rewards including TX fees and uncle rewards.</h6>
+                    <h5>Block maturity requires up to 520 blocks. Usually it's less indeed.</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-2">Blocks</th>
+                                <th class="col-lg-2">Shares/Diff</th>
+                                <th class="col-lg-2">Uncle Rate</th>
+                                <th class="col-lg-2">Orphan Rate</th>
+                            </tr>
+                            </thead>
+                            <tbody id="block-lucks-tbody">
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    <h3>Loading...</h3>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -294,14 +298,13 @@
 
                             $('#block-tag-new-blocks-label').text(response.candidatesTotal);
                             $('.block-tag-new-blocks-tbody').html(tbodyOfTable);
-
-                            setTimeout(function () {
-                                refreshBlocks();
-                            }, time);
                         })
                 }
 
                 refreshBlocks();
+                setInterval(function () {
+                    refreshBlocks();
+                }, time);
 
                 $(document).on('click', '.block-tag-mature-tbody a, .block-tag-new-blocks-tbody a, .block-tag-immature-tbody a', function () {
                     var blocks = 'https://explorer.pirl.io/#/block/';

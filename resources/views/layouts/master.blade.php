@@ -23,6 +23,9 @@
     <script type="text/javascript" src="{{ asset('') }}assets/js/plugins/ui/drilldown.js"></script>
     <!-- /core JS files -->
 
+    <script type="text/javascript" src="{{ asset('') }}assets/js/plugins/ui/moment/moment.min.js"></script>
+    <script type="text/javascript" src="{{ asset('') }}assets/js/plugins/ui/moment/moment_locales.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.min.js"></script>
 
@@ -90,7 +93,7 @@
 <!-- /page container -->
 
 <script>
-    var time = 3500;
+    var time = 4000;
 
     $.ajaxSetup({
         cache: false,

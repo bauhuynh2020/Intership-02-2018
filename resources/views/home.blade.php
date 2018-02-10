@@ -35,7 +35,7 @@
                 <div class="col-md-2">
                     <div class="panel panel-danger">
                         <div class="panel-heading">
-                            <h6 class="panel-title">Pool Hash Rate</h6>
+                            <h6 class="panel-title">Pool Hashrate</h6>
                         </div>
                         <div class="panel-body">
                             <h2 class="text-bold" id="stats-pool-hash-rate">0</h2>
@@ -82,6 +82,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-2">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            <h6 class="panel-title">Current round variance</h6>
+                        </div>
+                        <div class="panel-body">
+                            <h2 class="text-bold" id="stats-current-round_variance">0</h2>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-lg-12">
@@ -96,6 +106,28 @@
     <script>
         (function ($) {
             $(function () {
+                var getDuration = function (d1, d2) {
+                    d3 = new Date(d2 - d1);
+                    d0 = new Date(0);
+
+                    return {
+                        getHours: function () {
+                            return d3.getHours() - d0.getHours();
+                        },
+                        getMinutes: function () {
+                            return d3.getMinutes() - d0.getMinutes();
+                        },
+                        getMilliseconds: function () {
+                            return d3.getMilliseconds() - d0.getMilliseconds();
+                        },
+                        toString: function () {
+                            return this.getHours() + ":" +
+                                this.getMinutes() + ":" +
+                                this.getMilliseconds();
+                        },
+                    };
+                }
+
                 var api = 'http://beta-pirl.pool.sexy/api/stats';
 
                 var options = {
@@ -166,10 +198,14 @@
                         .done(function (response) {
                             $('#stats-miners-online').text(response.minersTotal);
                             $('#stats-pool-hash-rate').text(hashPower(response.hashrate));
-                            $('#stats-last-block-found').text(getMinute(response.stats.lastBlockFound));
+                            $('#stats-last-block-found').text(getTime(response.stats.lastBlockFound, response.now));
                             $('#stats-network-diff').text((response.nodes[0].difficulty / 1000000000000).toFixed(3) + ' T');
                             $('#stats-blockchain-height').text(response.nodes[0].height);
                             $('#stats-price').html(response.prices.BTC + ' <i class="fa fa-bitcoin"></i>');
+                            var difficulty = parseInt(response.nodes[0].difficulty);
+                            var nShares = response.nShares;
+                            var currentRound = (nShares / difficulty) * 100
+                            $('#stats-current-round_variance').text(currentRound.toFixed(2) + ' %');
 
                             var rangerPoint = 50;
                             var poolHistory = response.poolHistory;
@@ -184,35 +220,48 @@
                                 startPoint++;
                             }
 
-                            var minHash = Math.min(...chartHashrate);
-                            var maxHash = Math.max(...chartHashrate);
-                            var stepHash = maxHash - minHash;
+                            // var minHash = Math.min(...chartHashrate);
+                            // var maxHash = Math.max(...chartHashrate);
+                            // var stepHash = maxHash - minHash;
 
                             chart.data.labels = chartTimestamp;
                             chart.data.datasets[0].data = chartHashrate;
 
-                            chart.options.scales.yAxes[0].ticks.min = minHash;
-                            chart.options.scales.yAxes[0].ticks.max = maxHash + stepHash;
-                            chart.options.scales.yAxes[0].ticks.stepSize = stepHash;
+                            // chart.options.scales.yAxes[0].ticks.min = minHash;
+                            // chart.options.scales.yAxes[0].ticks.max = maxHash + stepHash;
+                            // chart.options.scales.yAxes[0].ticks.stepSize = stepHash;
                             chart.update();
-
-                            setTimeout(function () {
-                                refreshHome();
-                            }, time);
                         })
                 }
 
                 refreshHome();
+                setInterval(function () {
+                    refreshHome();
+                }, time);
             })
         })(jQuery)
 
-        function getMinute(number) {
-            var dateDiff = new Date(1000 * number);
-            var dateCurrent = new Date();
+        function getTime(d1, d2) {
+            var dateDiff = new Date(1000 * d1);
+            var dateCurrent = new Date(d2);
             var timeDiff = Math.abs(dateCurrent.getTime() - dateDiff.getTime());
-            var diffDays = Math.ceil(timeDiff / 1000);
+            // var diffDays = Math.ceil(timeDiff / 1000);
+            //
+            // return (diffDays / 60).toFixed(0) + ' minutes ago';
 
-            return (diffDays / 60).toFixed(0) + ' minutes ago';
+            var hours = Math.floor(timeDiff / (24 * 60 * 1000));
+            var minutes = Math.floor(timeDiff / (60 * 1000));
+            var seconds = timeDiff % 60;
+
+            var time = '';
+            if (hours > 0) {
+                time += hours + ' h ';
+            }
+            if (minutes > 0) {
+                time += minutes + 'm ';
+            }
+
+            return time + seconds + ' s';
         }
 
         function timeStampChart(number) {

@@ -103,14 +103,13 @@
                             $('#total-hashrate').text(hashPower(response.hashrate));
                             $('#total-miners-offline').text(totalMinersOffline);
                             $('#miners-tbody').html(tbodyOfTable);
-
-                            setTimeout(function () {
-                                refreshMiners();
-                            }, time);
                         })
                 }
 
                 refreshMiners();
+                setInterval(function () {
+                    refreshMiners();
+                }, time);
 
                 $(document).on('click', 'tbody a', function () {
                     $(this)

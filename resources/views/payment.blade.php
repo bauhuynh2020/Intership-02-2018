@@ -9,13 +9,7 @@
 @endsection
 @section('content')
     <div class="panel panel-flat">
-        <div class="panel-heading">
-            <h6 class="panel-title"></h6>
-            <div class="heading-elements">
-
-            </div>
-        </div>
-
+        <br/>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-3">
@@ -29,7 +23,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="panel panel-info">
+                    <div class="panel panel-danger">
                         <div class="panel-heading">
                             <h6 class="panel-title">Total amounts</h6>
                         </div>
@@ -95,14 +89,13 @@
 
                             $('#total-payment-sent').text(response.paymentsTotal);
                             $('#total-amounts').text(balancePrice(totalAmounts).toFixed(6));
-
-                            setTimeout(function () {
-                                refreshPayments();
-                            }, time);
                         })
                 }
 
                 refreshPayments();
+                setInterval(function () {
+                    refreshPayments();
+                }, time);
 
                 $(document).on('click', 'tbody a', function () {
                     var address = 'https://explorer.pirl.io/#/address/';
