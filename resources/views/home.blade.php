@@ -82,6 +82,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-2 col-md-offset-4">
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <h6 class="panel-title">Network hashrate</h6>
+                        </div>
+                        <div class="panel-body">
+                            <h2 class="text-bold" id="stats-network-hashrate">0</h2>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-2">
                     <div class="panel panel-danger">
                         <div class="panel-heading">
@@ -106,30 +116,6 @@
     <script>
         (function ($) {
             $(function () {
-                var getDuration = function (d1, d2) {
-                    d3 = new Date(d2 - d1);
-                    d0 = new Date(0);
-
-                    return {
-                        getHours: function () {
-                            return d3.getHours() - d0.getHours();
-                        },
-                        getMinutes: function () {
-                            return d3.getMinutes() - d0.getMinutes();
-                        },
-                        getMilliseconds: function () {
-                            return d3.getMilliseconds() - d0.getMilliseconds();
-                        },
-                        toString: function () {
-                            return this.getHours() + ":" +
-                                this.getMinutes() + ":" +
-                                this.getMilliseconds();
-                        },
-                    };
-                }
-
-                var api = 'http://beta-pirl.pool.sexy/api/stats';
-
                 var options = {
                     tooltips: {
                         displayColors: false,
@@ -192,7 +178,7 @@
 
                 var refreshHome = function () {
                     $.ajax({
-                        url: api,
+                        url: '{{ config('pool_config.api.host') }}stats',
                         method: 'get'
                     })
                         .done(function (response) {
@@ -202,6 +188,10 @@
                             $('#stats-network-diff').text((response.nodes[0].difficulty / 1000000000000).toFixed(3) + ' T');
                             $('#stats-blockchain-height').text(response.nodes[0].height);
                             $('#stats-price').html(response.prices.BTC + ' <i class="fa fa-bitcoin"></i>');
+
+                            var networkHashrate = parseInt(response.nodes[0].difficulty) / parseInt('{{ config('pool_config.block_time') }}');
+                            $('#stats-network-hashrate').text(hashPower(networkHashrate));
+
                             var difficulty = parseInt(response.nodes[0].difficulty);
                             var nShares = response.nShares;
                             var currentRound = (nShares / difficulty) * 100

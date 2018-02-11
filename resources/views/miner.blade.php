@@ -72,11 +72,9 @@
     <script>
         (function ($) {
             $(function () {
-                var api = 'http://beta-pirl.pool.sexy/api/miners';
-
                 var refreshMiners = function () {
                     $.ajax({
-                        url: api,
+                        url: '{{ config('pool_config.api.host') }}miners',
                         method: 'get'
                     })
                         .done(function (response) {
@@ -113,7 +111,7 @@
 
                 $(document).on('click', 'tbody a', function () {
                     $(this)
-                        .attr('href', 'account/' + $(this).text());
+                        .attr('href', '{{ route('get.account') }}/' + $(this).text());
                 });
             })
         })(jQuery)

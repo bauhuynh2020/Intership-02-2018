@@ -200,12 +200,16 @@
 @stop
 @section('javascript')
     <script>
+        String.prototype.splice = function (idx, rem, str) {
+            return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+        };
         (function ($) {
             $(function () {
-                var api = 'http://beta-pirl.pool.sexy/api/blocks';
-
                 var refreshBlocks = function () {
-                    $.getJSON(api)
+                    $.ajax({
+                        url: '{{ config('pool_config.api.host') }}blocks',
+                        method: 'get'
+                    })
                         .done(function (response) {
                             var lucks = response.luck;
                             var tbodyOfTable = '';
@@ -241,7 +245,7 @@
                                 }
 
                                 tbodyOfTable += '<tr>' +
-                                    '<td><a>' + item.height + '</a></td>' +
+                                    '<td><a>' + item.height.toString().splice(3, 0, ',') + '</a></td>' +
                                     '<td><a>' + hash + '</a></td>' +
                                     '<td>' + intToDate(item.timestamp) + '</td>' +
                                     '<td><span class="label label-' + danger + '">' + luckVal + ' %</span></td>' +
@@ -266,7 +270,7 @@
                                     }
 
                                     tbodyOfTable += '<tr>' +
-                                        '<td><a>' + item.height + '</a></td>' +
+                                        '<td><a>' + item.height.toString().splice(3, 0, ',') + '</a></td>' +
                                         '<td><a>' + item.hash + '</a></td>' +
                                         '<td>' + intToDate(item.timestamp) + '</td>' +
                                         '<td><span class="label label-' + danger + '">' + luckVal + ' %</span></td>' +
@@ -289,7 +293,7 @@
                                     var luck = ((item.shares) / (item.difficulty)) * 100;
 
                                     tbodyOfTable += '<tr>' +
-                                        '<td><a>' + item.height + '</a></td>' +
+                                        '<td><a>' + item.height.toString().splice(3, 0, ',') + '</a></td>' +
                                         '<td>' + intToDate(item.timestamp) + '</td>' +
                                         '<td>' + luck.toFixed(0) + ' %</td>' +
                                         '</tr>';
@@ -307,10 +311,8 @@
                 }, time);
 
                 $(document).on('click', '.block-tag-mature-tbody a, .block-tag-new-blocks-tbody a, .block-tag-immature-tbody a', function () {
-                    var blocks = 'https://explorer.pirl.io/#/block/';
-
                     $(this)
-                        .attr('href', blocks + $(this).text())
+                        .attr('href', '{{ config('pool_config.block_explorer.df') }}' + $(this).text().replace(',', ''))
                         .attr('target', '_blank');
                 });
             })

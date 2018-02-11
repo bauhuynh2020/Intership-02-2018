@@ -8,11 +8,11 @@ Route::get('/miners', function () {
     return view('miner');
 })->name('get.miners');
 
-Route::get('account/{id}', function () {
+Route::get('account/{id?}', function () {
     return view('account', array(
         'id' => request()->route('id')
     ));
-});
+})->name('get.account');
 
 Route::get('/blocks', function () {
     return view('block');

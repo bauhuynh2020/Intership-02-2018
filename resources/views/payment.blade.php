@@ -63,11 +63,9 @@
     <script>
         (function ($) {
             $(function () {
-                var api = 'http://beta-pirl.pool.sexy/api/payments';
-
                 var refreshPayments = function () {
                     $.ajax({
-                        url: api,
+                        url: '{{ config('pool_config.api.host') }}payments',
                         method: 'get'
                     })
                         .done(function (response) {
@@ -80,7 +78,7 @@
 
                                 tbodyOfTable += '<tr>' +
                                     '<td>' + intToDate(item.timestamp) + '</td>' +
-                                    '<td>' + balancePrice(item.amount).toFixed(6) + '</td>' +
+                                    '<td>' + balancePrice(item.amount) + '</td>' +
                                     '<td><a data-toggle="address">' + item.address + '</a></td>' +
                                     '<td><a data-toggle="tx">' + item.tx + '</a></td>' +
                                     '</tr>';
@@ -98,15 +96,12 @@
                 }, time);
 
                 $(document).on('click', 'tbody a', function () {
-                    var address = 'https://explorer.pirl.io/#/address/';
-                    var tx = 'https://explorer.pirl.io/#/tx/';
-
                     switch ($(this).data('toggle')) {
                         case 'address':
-                            $(this).attr('href', address + $(this).text());
+                            $(this).attr('href', '{{ config('pool_config.block_explorer.addr') }}' + $(this).text());
                             break;
                         default:
-                            $(this).attr('href', tx + $(this).text());
+                            $(this).attr('href', '{{ config('pool_config.block_explorer.tx') }}' + $(this).text());
                             break;
                     }
                     $(this).attr('target', '_blank');

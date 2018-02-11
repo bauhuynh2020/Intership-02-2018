@@ -19,7 +19,7 @@
 @section('content')
     <div class="panel panel-flat">
         <div class="panel-heading">
-            <h6 class="panel-title"></h6>
+            <h4 class="panel-title">Account: {{ $id }}</h4>
             <div class="heading-elements">
 
             </div>
@@ -261,8 +261,6 @@
     <script>
         (function ($) {
             $(function () {
-                var api = 'http://beta-pirl.pool.sexy/api/accounts/' + '{{ $id }}';
-                var api_2 = 'http://beta-pirl.pool.sexy/api/stats';
                 var roundSharesAccount = 0;
 
                 var options = {
@@ -361,20 +359,9 @@
                     options: options
                 });
 
-                var statsRefresh = function () {
-                    $.ajax({
-                        url: api_2,
-                        method: 'get'
-                    })
-                        .done(function (response) {
-                            var roundShare = (roundSharesAccount / response.stats.roundShares) * 100;
-                            $('#account-your-round-share').text(roundShare.toFixed(2) + '%');
-                        })
-                }
-
                 var accountRefresh = function () {
                     $.ajax({
-                        url: api,
+                        url: '{{ config('pool_config.api.host') }}accounts/{{ $id }}',
                         method: 'get'
                     })
                         .done(function (response) {
@@ -481,24 +468,36 @@
                                     '</tr>';
                             })
                             $('#account-payouts').html(tbodyOfTable);
-                        })
+                        });
+                }
+
+                var statsRefresh = function () {
+                    $.ajax({
+                        url: '{{ config('pool_config.api.host') }}stats',
+                        method: 'get'
+                    })
+                        .done(function (response) {
+                            var roundShare = (roundSharesAccount / response.stats.roundShares) * 100;
+                            $('#account-your-round-share').text(roundShare.toFixed(2) + '%');
+                        });
                 }
 
                 accountRefresh();
                 setInterval(function () {
                     accountRefresh();
-                }, time * 10);
+                }, time * 5);
 
                 statsRefresh();
                 setInterval(function () {
                     statsRefresh();
-                    statsRefresh();
-                }, time);
+                    setTimeout(function () {
+                        statsRefresh();
+                    }, 500);
+                }, time + 500);
 
                 $(document).on('click', '#account-payouts a', function () {
-                    var tx = 'https://explorer.pirl.io/#/tx/';
                     $(this)
-                        .attr('href', tx + $(this).text())
+                        .attr('href', '{{ config('pool_config.block_explorer.tx') }}' + $(this).text())
                         .attr('target', '_blank');
                 });
             })
