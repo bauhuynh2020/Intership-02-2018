@@ -42,24 +42,7 @@
 <body>
 
 <!-- Second navbar -->
-<div class="navbar navbar-default navbar-inverse" id="navbar-second">
-    <div class="navbar-collapse collapse" id="navbar-second-toggle">
-        <ul class="nav navbar-nav">
-            <li>
-                <a href="{{ route('get.home') }}"><i class="fa fa-tachometer"></i> Home</a>
-            </li>
-            <li>
-                <a href="{{ route('get.miners') }}"><i class="fa fa-bitcoin"></i> Miners</a>
-            </li>
-            <li>
-                <a href="{{ route('get.blocks') }}"><i class="fa fa-briefcase"></i> Blocks</a>
-            </li>
-            <li>
-                <a href="{{ route('get.payments') }}"><i class="fa fa-paypal"></i> Payments</a>
-            </li>
-        </ul>
-    </div>
-</div>
+@include('layouts.navbar')
 <!-- /second navbar -->
 
 <!-- Page container -->

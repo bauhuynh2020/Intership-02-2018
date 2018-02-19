@@ -49,9 +49,9 @@
                         <table class="table">
                             <thead>
                             <tr>
-                                <th>Login</th>
-                                <th>Hashrate</th>
-                                <th>Last beat</th>
+                                <th class="col-lg-6">Login</th>
+                                <th class="col-lg-3">Hashrate</th>
+                                <th class="col-lg-2">Last beat</th>
                             </tr>
                             </thead>
                             <tbody id="miners-tbody">
