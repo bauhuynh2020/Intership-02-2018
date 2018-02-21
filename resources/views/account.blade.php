@@ -388,7 +388,7 @@
                             var chartHashrate = new Array();
                             var chartWorkers = new Array();
                             var endPoint = poolHistory.length - 1;
-                            var startPoint = endPoint - rangerPoint;
+                            var startPoint = 0;
 
                             while (startPoint < endPoint) {
                                 chartTimestamp.push(poolHistory[startPoint].timestamp);
